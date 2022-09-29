@@ -3,21 +3,23 @@
 
 import * as React from 'react'
 
-function useLocalStorage(valueName, initialValue) {
-  const [value, setValue] = React.useState(
-    () => window.localStorage.getItem(valueName) ?? initialValue,
-  )
+function useLocalStorage(key, initialValue) {
+  function getInitialValue() {
+    return JSON.parse(window.localStorage.getItem(key)) ?? initialValue
+  }
+
+  const [value, setValue] = React.useState(getInitialValue)
 
   React.useEffect(() => {
-    window.localStorage.setItem(valueName, value)
-  }, [value, valueName])
+    window.localStorage.setItem(key, JSON.stringify(value))
+  }, [value, key])
 
   return [value, setValue]
 }
 
-function Greeting({initialName = ''}) {
+function Greeting({initialName = null}) {
   // 🐨 initialize the state to the value from localStorage
-  // 💰 window.localStorage.getItem('name') ?? initialName
+  // 💰 window.localStorage.getItem('name') ?? initialName2
   const initialValue = initialName ?? undefined
   const [name, setName] = useLocalStorage('name', initialValue)
 
