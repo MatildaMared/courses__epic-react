@@ -2,17 +2,13 @@
 // http://localhost:3000/isolated/exercise/04.js
 
 import * as React from 'react'
+import {useLocalStorageState} from './../utils'
 
 function Board() {
-  // 🐨 squares is the state for this component. Add useState for squares
-  const [squares, setSquares] = React.useState(Array(9).fill(null))
-
-  // 🐨 We'll need the following bits of derived state:
-  // - nextValue ('X' or 'O')
-  // - winner ('X', 'O', or null)
-  // - status (`Winner: ${winner}`, `Scratch: Cat's game`, or `Next player: ${nextValue}`)
-  // 💰 I've written the calculations for you! So you can use my utilities
-  // below to create these variables
+  const [squares, setSquares] = useLocalStorageState(
+    'board',
+    Array(9).fill(null),
+  )
   const [nextValue, setNextValue] = React.useState(calculateNextValue(squares))
   const [winner, setWinner] = React.useState(null)
   const [status, setStatus] = React.useState(
