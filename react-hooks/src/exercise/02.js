@@ -5,7 +5,11 @@ import * as React from 'react'
 
 function useLocalStorage(key, initialValue) {
   function getInitialValue() {
-    return JSON.parse(window.localStorage.getItem(key)) ?? initialValue
+    const valueInStorage = window.localStorage.getItem(key);
+    if (valueInStorage) {
+      return JSON.parse(valueInStorage);
+    }
+    return initialValue;
   }
 
   const [value, setValue] = React.useState(getInitialValue)
@@ -17,7 +21,7 @@ function useLocalStorage(key, initialValue) {
   return [value, setValue]
 }
 
-function Greeting({initialName = null}) {
+function Greeting({initialName = ''}) {
   // 🐨 initialize the state to the value from localStorage
   // 💰 window.localStorage.getItem('name') ?? initialName2
   const initialValue = initialName ?? undefined
