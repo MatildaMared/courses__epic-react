@@ -6,13 +6,17 @@ import {PokemonForm, fetchPokemon, PokemonInfoFallback, PokemonDataView} from '.
 
 function PokemonInfo({pokemonName}) {
     const [pokemon, setPokemon] = React.useState(null);
+    const [error, setError] = React.useState(null);
 
     React.useEffect(() => {
         if (!pokemonName) return;
 
         setPokemon(null);
+        setError(null);
         fetchPokemon(pokemonName).then((pokemonData) => {
             setPokemon(pokemonData)
+        }).catch(error => {
+            setError(error);
         })
     }, [pokemonName])
 
@@ -21,6 +25,9 @@ function PokemonInfo({pokemonName}) {
           {!pokemonName && "Submit a pokemon"}
           {pokemonName && !pokemon && <PokemonInfoFallback name={pokemonName} />}
           {pokemon && <PokemonDataView pokemon={pokemon} />}
+          {error && <div role="alert">
+              There was an error: <pre style={{whiteSpace: 'normal'}}>{error.message}</pre>
+          </div>}
           </>
   )
 }
