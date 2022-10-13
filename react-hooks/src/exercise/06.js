@@ -5,34 +5,38 @@ import * as React from 'react'
 import {PokemonForm, fetchPokemon, PokemonInfoFallback, PokemonDataView} from '../pokemon'
 
 function PokemonInfo({pokemonName}) {
-    const [pokemon, setPokemon] = React.useState(null);
-    const [error, setError] = React.useState(null);
-    const [status, setStatus] = React.useState("idle");
+    const [state, setState] = React.useState({status: "idle"})
 
     React.useEffect(() => {
         if (!pokemonName) {
-            setStatus("idle")
+            setState({status: "idle"})
         };
 
-        setPokemon(null);
-        setError(null);
-        setStatus("pending");
+        setState({
+            status: "pending",
+            error: null,
+            pokemon: null
+        })
         fetchPokemon(pokemonName).then((pokemonData) => {
-            setPokemon(pokemonData)
-            setStatus("resolved")
+            setState({
+                status: "resolved",
+                pokemon: pokemonData
+            })
         }).catch(error => {
-            setError(error);
-            setStatus("rejected")
+            setState({
+                status: "rejected",
+                error: error
+            })
         })
     }, [pokemonName])
 
   return (
           <>
-          {status === "idle" && !pokemonName && "Submit a pokemon"}
-          {pokemonName && (status === "idle" || status === "pending") && <PokemonInfoFallback name={pokemonName} />}
-          {status === "resolved" && <PokemonDataView pokemon={pokemon} />}
-          {status === "rejected" && <div role="alert">
-              There was an error: <pre style={{whiteSpace: 'normal'}}>{error.message}</pre>
+          {state.status === "idle" && !pokemonName && "Submit a pokemon"}
+          {pokemonName && (state.status === "idle" || state.status === "pending") && <PokemonInfoFallback name={pokemonName} />}
+          {state.status === "resolved" && <PokemonDataView pokemon={state.pokemon} />}
+          {state.status === "rejected" && <div role="alert">
+              There was an error: <pre style={{whiteSpace: 'normal'}}>{state.error.message}</pre>
           </div>}
           </>
   )
