@@ -3,6 +3,7 @@
 
 import * as React from 'react'
 import {Switch} from '../switch'
+import warning from 'warning'
 
 const callAll =
   (...fns) =>
@@ -34,10 +35,16 @@ function useToggle({
   onChange,
   on: controlledOn,
 } = {}) {
+  if (controlledOn && !onChange) {
+    warning(
+      false,
+      'Warning: Failed prop type: You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`',
+    )
+  }
+
   const {current: initialState} = React.useRef({on: initialOn})
   const [state, dispatch] = React.useReducer(reducer, initialState)
   const onIsControlled = controlledOn != null
-
 
   const on = onIsControlled ? controlledOn : state.on
 
@@ -123,6 +130,7 @@ function App() {
             console.info('Uncontrolled Toggle onChange', ...args)
           }
         />
+        <Toggle on={true} />
       </div>
     </div>
   )
