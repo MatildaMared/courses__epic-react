@@ -34,13 +34,16 @@ function useToggle({
   reducer = toggleReducer,
   onChange,
   on: controlledOn,
+  readOnly = false,
 } = {}) {
-  if (controlledOn && !onChange) {
-    warning(
-      false,
-      'Warning: Failed prop type: You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`',
-    )
-  }
+  React.useEffect(() => {
+    if (controlledOn && !onChange && !readOnly) {
+      warning(
+        false,
+        'Warning: Failed prop type: You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`',
+      )
+    }
+  }, [controlledOn, onChange, readOnly])
 
   const {current: initialState} = React.useRef({on: initialOn})
   const [state, dispatch] = React.useReducer(reducer, initialState)
@@ -64,6 +67,7 @@ function useToggle({
     return {
       'aria-pressed': on,
       onClick: callAll(onClick, toggle),
+      readOnly,
       ...props,
     }
   }
@@ -84,8 +88,12 @@ function useToggle({
   }
 }
 
-function Toggle({on: controlledOn, onChange}) {
-  const {on, getTogglerProps} = useToggle({on: controlledOn, onChange})
+function Toggle({on: controlledOn, onChange, readOnly}) {
+  const {on, getTogglerProps} = useToggle({
+    on: controlledOn,
+    onChange,
+    readOnly,
+  })
   const props = getTogglerProps({on})
   return <Switch {...props} />
 }
@@ -130,7 +138,6 @@ function App() {
             console.info('Uncontrolled Toggle onChange', ...args)
           }
         />
-        <Toggle on={true} />
       </div>
     </div>
   )
