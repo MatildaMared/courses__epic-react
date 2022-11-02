@@ -36,20 +36,38 @@ function useToggle({
   on: controlledOn,
   readOnly = false,
 } = {}) {
-  React.useEffect(() => {
-    if (controlledOn && !onChange && !readOnly) {
-      warning(
-        false,
-        'Warning: Failed prop type: You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`',
-      )
-    }
-  }, [controlledOn, onChange, readOnly])
-
   const {current: initialState} = React.useRef({on: initialOn})
   const [state, dispatch] = React.useReducer(reducer, initialState)
   const onIsControlled = controlledOn != null
-
   const on = onIsControlled ? controlledOn : state.on
+  const {current: onWasControlled} = React.useRef(onIsControlled)
+
+  React.useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      if (onIsControlled && !onWasControlled) {
+        warning(
+          false,
+          'Warning: A component is changing an uncontrolled input of type undefined to be controlled. Input elements should not switch from uncontrolled to controlled (or vice versa). Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://fb.me/react-controlled-components',
+        )
+      } else if (!onIsControlled && onWasControlled) {
+        warning(
+          false,
+          'Warning: A component is changing a controlled input of type undefined to be uncontrolled. Input elements should not switch from controlled to uncontrolled (or vice versa). Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://fb.me/react-controlled-components',
+        )
+      }
+    }
+  }, [onWasControlled, onIsControlled])
+
+  React.useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      if (controlledOn && !onChange && !readOnly) {
+        warning(
+          false,
+          'Warning: Failed prop type: You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`',
+        )
+      }
+    }
+  }, [controlledOn, onChange, readOnly])
 
   function dispatchWithOnChange(action) {
     if (!onIsControlled) {
