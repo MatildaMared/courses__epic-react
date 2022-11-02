@@ -4,11 +4,14 @@
 import * as React from 'react'
 import {Switch} from '../switch'
 
-const callAll = (...fns) => (...args) => fns.forEach(fn => fn?.(...args))
+const callAll =
+  (...fns) =>
+  (...args) =>
+    fns.forEach(fn => fn?.(...args))
 
 const actionTypes = {
-  toggle: "toggle",
-  reset: "reset"
+  toggle: 'toggle',
+  reset: 'reset',
 }
 
 function toggleReducer(state, {type, initialState}) {
@@ -62,19 +65,10 @@ function App() {
   const clickedTooMuch = timesClicked >= 4
 
   function toggleStateReducer(state, action) {
-    switch (action.type) {
-      case actionTypes.toggle: {
-        if (clickedTooMuch) {
-          return {on: state.on}
-        }
-        return {on: !state.on}
-      }
-      case actionTypes.reset: {
-        return {on: false}
-      }
-      default: {
-        throw new Error(`Unsupported type: ${action.type}`)
-      }
+    if (action.type === actionTypes.toggle && clickedTooMuch) {
+      return {on: state.on}
+    } else {
+      return toggleReducer(state, action)
     }
   }
 
